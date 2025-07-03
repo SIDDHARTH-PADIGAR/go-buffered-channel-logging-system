@@ -34,10 +34,6 @@ Logged: Log entry #1
 
 ---
 
-Here you go — full **working code** + **clear explanation in the format you asked for**. This version proves the blocking behavior of buffered channels **visibly** and behaves exactly as you'd expect when the buffer fills.
-
----
-
 ###  Why This Works Well
 
 * First 3 logs are pushed into the buffer **instantly**, because the channel has a capacity of 3.
