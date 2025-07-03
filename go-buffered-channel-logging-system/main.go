@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"runtime"
 	"time"
 )
 
-// Logger simulates a slow log writer
 func Logger(logChannel chan string) {
 	for msg := range logChannel {
 		time.Sleep(500 * time.Millisecond) // Simulate slow I/O
@@ -14,17 +14,18 @@ func Logger(logChannel chan string) {
 }
 
 func main() {
-	logChannel := make(chan string, 3) // Buffered channel with capacity 3
+	runtime.GOMAXPROCS(1) // Force single OS thread to better observe goroutine scheduling
 
-	// Start the logger goroutine
+	logChannel := make(chan string, 3) // Buffered channel with capacity 3
 	go Logger(logChannel)
 
-	// Simulate rapid log generation
 	for i := 1; i <= 5; i++ {
 		logMessage := fmt.Sprintf("Log entry #%d", i)
-		fmt.Println("Sending:", logMessage)
-		logChannel <- logMessage // This won't block until buffer is full
+
+		fmt.Printf(">>> Attempting to send: %s\n", logMessage)
+		logChannel <- logMessage // Blocks after buffer is full
+		fmt.Printf("✓✓✓ Sent: %s\n", logMessage)
 	}
 
-	close(logChannel) // Always close channels when done
+	close(logChannel)
 }
